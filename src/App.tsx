@@ -14,8 +14,9 @@ export const App = () => {
   const [userId, setUserId] = useState(0);
   const [todos, setTodos] = useState<Todo[]>(typedTodos);
 
-  // Додаємо стан для відстеження спроби сабміту (щоб показувати помилки, коли форма порожня)
-  const [hasSubmitted, setHasSubmitted] = useState(false);
+  // Розділяємо помилки на окремі стани
+  const [hasTitleError, setHasTitleError] = useState(false);
+  const [hasUserError, setHasUserError] = useState(false);
 
   const getUser = (id: number): User | undefined => {
     return typedUsers.find(user => user.id === Number(id));
@@ -23,9 +24,14 @@ export const App = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setHasSubmitted(true);
 
-    if (!title.trim() || userId === 0) {
+    const isTitleError = !title.trim();
+    const isUserError = userId === 0;
+
+    setHasTitleError(isTitleError);
+    setHasUserError(isUserError);
+
+    if (isTitleError || isUserError) {
       return;
     }
 
@@ -43,12 +49,9 @@ export const App = () => {
 
     setTitle('');
     setUserId(0);
-    setHasSubmitted(false);
+    setHasTitleError(false);
+    setHasUserError(false);
   };
-
-  // Перевірки на помилки для полів
-  const hasTitleError = hasSubmitted && !title.trim();
-  const hasUserError = hasSubmitted && userId === 0;
 
   return (
     <div className="App">
@@ -61,7 +64,7 @@ export const App = () => {
             value={title}
             onChange={event => {
               setTitle(event.target.value);
-              setHasSubmitted(false);
+              setHasTitleError(false);
             }}
             type="text"
             data-cy="titleInput"
@@ -79,7 +82,7 @@ export const App = () => {
             value={userId}
             onChange={event => {
               setUserId(Number(event.target.value));
-              setHasSubmitted(false);
+              setHasUserError(false);
             }}
           >
             <option value="0" disabled>
