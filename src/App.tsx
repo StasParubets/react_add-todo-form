@@ -29,12 +29,15 @@ export const App = () => {
       return;
     }
 
+    const selectedUser = typedUsers.find(user => user.id === Number(userId));
+
     const newTodo: Todo = {
       id: Math.max(...todos.map(t => t.id)) + 1,
       title: title.trim(),
       userId: Number(userId),
       completed: false,
-    };
+      user: selectedUser,
+    } as Todo & { user?: User };
 
     setTodos([...todos, newTodo]);
 
@@ -56,7 +59,10 @@ export const App = () => {
           <label htmlFor="title">Title: </label>
           <input
             value={title}
-            onChange={e => setTitle(e.target.value)}
+            onChange={event => {
+              setTitle(event.target.value);
+              setHasSubmitted(false);
+            }}
             type="text"
             data-cy="titleInput"
             placeholder="Enter a title"
@@ -71,7 +77,10 @@ export const App = () => {
             data-cy="userSelect"
             id="select"
             value={userId}
-            onChange={e => setUserId(Number(e.target.value))}
+            onChange={event => {
+              setUserId(Number(event.target.value));
+              setHasSubmitted(false);
+            }}
           >
             <option value="0" disabled>
               Choose a user
